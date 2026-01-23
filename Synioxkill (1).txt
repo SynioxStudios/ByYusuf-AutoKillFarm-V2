@@ -64,15 +64,16 @@ Credit.Text = "by Yusuf"; Credit.TextTransparency = 0.5; Credit.TextXAlignment =
 task.spawn(function()
     while _G.KillActive do
         pcall(function()
-            local character = LocalPlayer.Character
-            local rightHand = character and character:FindFirstChild("RightHand")
-            local leftHand = character and character:FindFirstChild("LeftHand")
-            local punch = LocalPlayer.Backpack:FindFirstChild("Punch") or (character and character:FindFirstChild("Punch"))
+            local char = LocalPlayer.Character
+            local rightHand = char and char:FindFirstChild("RightHand")
+            local leftHand = char and char:FindFirstChild("LeftHand")
+            local punch = LocalPlayer.Backpack:FindFirstChild("Punch") or (char and char:FindFirstChild("Punch"))
 
             if punch then
-                punch.Parent = character
-                if punch:FindFirstChild("attackTime") then punch.attackTime.Value = 0 end
-                punch:Activate()
+                if punch.Parent ~= char then punch.Parent = char end
+                
+                LocalPlayer.muscleEvent:FireServer("punch", "rightHand")
+                LocalPlayer.muscleEvent:FireServer("punch", "leftHand")
 
                 if rightHand and leftHand then
                     for _, target in ipairs(Players:GetPlayers()) do
@@ -89,7 +90,7 @@ task.spawn(function()
                 end
             end
         end)
-        task.wait(0.05)
+        task.wait(0.01)
     end
 end)
 
@@ -117,8 +118,11 @@ task.spawn(function()
     forceHop()
 end)
 
-RS.RenderStepped:Connect(function()
-    local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
-    KillLabel.Text = "💀 KILLS: " .. (kills and tostring(kills.Value) or "0")
-    FPSLabel.Text = "⚡ FPS: " .. math.floor(1/RS.RenderStepped:Wait())
+task.spawn(function()
+    while task.wait(0.05) do
+        local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
+        KillLabel.Text = "💀 KILLS: " .. (kills and tostring(kills.Value) or "0")
+        local currentFps = math.floor(1 / RS.RenderStepped:Wait())
+        FPSLabel.Text = "⚡ FPS: " .. currentFps
+    end
 end)
