@@ -73,25 +73,28 @@ task.spawn(function()
 end)
 
 local function forceHop()
-    local success, result = pcall(function()
-        return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Desc&limit=100")).data
-    end)
-    if success and result then
-        for _, server in pairs(result) do
-            if server.playing >= 18 and server.playing < server.maxPlayers and server.id ~= game.JobId then
-                TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
-                task.wait(1.5)
+    while true do
+        local success, result = pcall(function()
+            return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Desc&limit=100")).data
+        end)
+        
+        if success and result then
+            for _, server in pairs(result) do
+                if server.playing >= 18 and server.playing < server.maxPlayers and server.id ~= game.JobId then
+                    TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
+                end
             end
         end
+        task.wait(0.5) 
     end
-    task.wait(1); forceHop()
 end
 
 task.spawn(function()
     local t = _G.HopInterval
     while t > 0 do
         _G.CurrentHop = t
-        task.wait(1); t = t - 1
+        task.wait(1)
+        t = t - 1
     end
     forceHop()
 end)
