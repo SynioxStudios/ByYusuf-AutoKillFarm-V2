@@ -61,7 +61,7 @@ local function forceHop()
     end)
     if success and result then
         for _, server in pairs(result) do
-            if server.playing < server.maxPlayers and server.id ~= game.JobId then
+            if server.playing >= 18 and server.playing < server.maxPlayers and server.id ~= game.JobId then
                 TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
                 task.wait(1.5)
             end
@@ -81,8 +81,8 @@ end)
 
 local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 local MainBack = Instance.new("Frame", ScreenGui)
-MainBack.Size = UDim2.new(0, 180, 0, 90)
-MainBack.Position = UDim2.new(0, 15, 0.5, -45)
+MainBack.Size = UDim2.new(0, 180, 0, 70)
+MainBack.Position = UDim2.new(0, 15, 0.5, -35)
 MainBack.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 MainBack.BackgroundTransparency = 0.4
 MainBack.BorderSizePixel = 0
@@ -100,10 +100,8 @@ Info.TextXAlignment = Enum.TextXAlignment.Left
 task.spawn(function()
     while task.wait(0.05) do
         local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
-        local fps = math.floor(1 / RS.RenderStepped:Wait())
         Info.Text = string.format(
-            "SYNIOX KİLL PAİD\n\nFPS: %d\nKills: %s\nHop: %ds", 
-            fps, 
+            "SYNİOX KİLL PAİD\n\nKills: %s\nHop: %ds", 
             (kills and tostring(kills.Value) or "0"), 
             _G.CurrentHop or 0
         )
