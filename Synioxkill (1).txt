@@ -10,6 +10,25 @@ local SecretAreaPos = CFrame.new(1947, 2, 6191)
 local playerWhitelist = {}
 
 task.spawn(function()
+    local lighting = game:GetService("Lighting")
+    local terrain = game:GetService("Workspace"):FindFirstChildOfClass('Terrain')
+    lighting.Brightness = 0.5
+    lighting.OutdoorAmbient = Color3.fromRGB(120, 120, 120)
+    lighting.Ambient = Color3.fromRGB(120, 120, 120)
+    lighting.ClockTime = 14
+    if terrain then
+        terrain.WaterWaveSize = 0
+        terrain.WaterWaveSpeed = 0
+        terrain.WaterReflectance = 0
+    end
+    for _, v in pairs(game:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("BlurEffect") or v:IsA("SunRaysEffect") then
+            v.Enabled = false
+        end
+    end
+end)
+
+task.spawn(function()
     local function setupCharacter(char)
         local hrp = char:WaitForChild("HumanoidRootPart")
         hrp.CFrame = SecretAreaPos
@@ -30,10 +49,8 @@ task.spawn(function()
             local punch = LocalPlayer.Backpack:FindFirstChild("Punch") or (char and char:FindFirstChild("Punch"))
             if punch then
                 if punch.Parent ~= char then punch.Parent = char end
-                
                 LocalPlayer.muscleEvent:FireServer("punch", "rightHand")
                 LocalPlayer.muscleEvent:FireServer("punch", "leftHand")
-                
                 local rHand = char:FindFirstChild("RightHand")
                 if rHand then
                     for _, target in ipairs(Players:GetPlayers()) do
@@ -100,10 +117,6 @@ Info.TextXAlignment = Enum.TextXAlignment.Left
 task.spawn(function()
     while task.wait(0.05) do
         local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
-        Info.Text = string.format(
-            "SYNİOX KİLL PAİD\n\nKills: %s\nHop: %ds", 
-            (kills and tostring(kills.Value) or "0"), 
-            _G.CurrentHop or 0
-        )
+        Info.Text = string.format("SYNİOX KİLL PAİD\n\nKills: %s\nHop: %ds", (kills and tostring(kills.Value) or "0"), _G.CurrentHop or 0)
     end
 end)
