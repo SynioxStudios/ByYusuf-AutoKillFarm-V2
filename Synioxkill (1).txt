@@ -5,7 +5,7 @@ local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 
 _G.KillActive = true
-_G.HopInterval = 60
+_G.HopInterval = 50
 local SecretAreaPos = CFrame.new(1947, 2, 6191)
 local playerWhitelist = {}
 
