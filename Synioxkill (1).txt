@@ -13,77 +13,38 @@ task.spawn(function()
     local function setupCharacter(char)
         local hrp = char:WaitForChild("HumanoidRootPart")
         hrp.CFrame = SecretAreaPos
-        
         local bodyVelocity = Instance.new("BodyVelocity")
         bodyVelocity.MaxForce = Vector3.new(100000, 0, 100000)
         bodyVelocity.Velocity = Vector3.new(0, 0, 0)
         bodyVelocity.P = 1250
         bodyVelocity.Parent = hrp
     end
-    
     if LocalPlayer.Character then setupCharacter(LocalPlayer.Character) end
     LocalPlayer.CharacterAdded:Connect(setupCharacter)
 end)
-
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "SynioxGui"
-
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-MainFrame.Position = UDim2.new(0.5, -85, 0.5, -85)
-MainFrame.Size = UDim2.new(0, 170, 0, 170)
-MainFrame.Active, MainFrame.Draggable = true, true
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
-local UIStroke = Instance.new("UIStroke", MainFrame)
-UIStroke.Color = Color3.fromRGB(200, 0, 0); UIStroke.Thickness = 2
-
-local Title = Instance.new("TextLabel", MainFrame)
-Title.Size = UDim2.new(1, 0, 0, 30); Title.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-Title.Text = "SYNIOX V2"; Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.GothamBold; Title.TextSize = 14
-Instance.new("UICorner", Title).CornerRadius = UDim.new(0, 12)
-
-local Content = Instance.new("Frame", MainFrame)
-Content.Size = UDim2.new(1, 0, 1, -35); Content.Position = UDim2.new(0, 0, 0, 35)
-Content.BackgroundTransparency = 1
-
-local function CreateLabel(name, pos, color, size)
-    local l = Instance.new("TextLabel", Content)
-    l.Position = pos; l.Size = UDim2.new(1, 0, 0, 25)
-    l.BackgroundTransparency = 1; l.TextColor3 = color
-    l.Font = Enum.Font.GothamBold; l.TextSize = size
-    return l
-end
-
-local FPSLabel = CreateLabel("FPS", UDim2.new(0, 0, 0, 10), Color3.fromRGB(0, 255, 150), 14)
-local KillLabel = CreateLabel("Kills", UDim2.new(0, 0, 0, 40), Color3.fromRGB(255, 200, 0), 16)
-local TimerLabel = CreateLabel("Timer", UDim2.new(0, 0, 0, 75), Color3.fromRGB(255, 255, 255), 20)
-local Credit = CreateLabel("By", UDim2.new(0, -10, 1, -20), Color3.fromRGB(255, 255, 255), 11)
-Credit.Text = "by Yusuf"; Credit.TextTransparency = 0.5; Credit.TextXAlignment = Enum.TextXAlignment.Right
 
 task.spawn(function()
     while _G.KillActive do
         pcall(function()
             local char = LocalPlayer.Character
-            local rightHand = char and char:FindFirstChild("RightHand")
-            local leftHand = char and char:FindFirstChild("LeftHand")
             local punch = LocalPlayer.Backpack:FindFirstChild("Punch") or (char and char:FindFirstChild("Punch"))
-
             if punch then
                 if punch.Parent ~= char then punch.Parent = char end
                 
                 LocalPlayer.muscleEvent:FireServer("punch", "rightHand")
                 LocalPlayer.muscleEvent:FireServer("punch", "leftHand")
-
-                if rightHand and leftHand then
+                
+                local rHand = char:FindFirstChild("RightHand")
+                if rHand then
                     for _, target in ipairs(Players:GetPlayers()) do
-                        if target ~= LocalPlayer and not playerWhitelist[target.Name] then
-                            local tRoot = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
-                            if tRoot then
-                                firetouchinterest(rightHand, tRoot, 1)
-                                firetouchinterest(leftHand, tRoot, 1)
-                                firetouchinterest(rightHand, tRoot, 0)
-                                firetouchinterest(leftHand, tRoot, 0)
+                        if target ~= LocalPlayer and not playerWhitelist[target.Name] and target.Character then
+                            local tRoot = target.Character:FindFirstChild("HumanoidRootPart")
+                            local tHum = target.Character:FindFirstChild("Humanoid")
+                            if tRoot and tHum and tHum.Health > 0 then
+                                tRoot.Size = Vector3.new(15, 15, 15)
+                                tRoot.CanCollide = false
+                                firetouchinterest(rHand, tRoot, 1)
+                                firetouchinterest(rHand, tRoot, 0)
                             end
                         end
                     end
@@ -95,7 +56,6 @@ task.spawn(function()
 end)
 
 local function forceHop()
-    TimerLabel.Text = "TP..."
     local success, result = pcall(function()
         return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Desc&limit=100")).data
     end)
@@ -113,16 +73,39 @@ end
 task.spawn(function()
     local t = _G.HopInterval
     while t > 0 do
-        TimerLabel.Text = "HOP: "..t.."s"; task.wait(1); t = t - 1
+        _G.CurrentHop = t
+        task.wait(1); t = t - 1
     end
     forceHop()
 end)
 
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local MainBack = Instance.new("Frame", ScreenGui)
+MainBack.Size = UDim2.new(0, 180, 0, 90)
+MainBack.Position = UDim2.new(0, 15, 0.5, -45)
+MainBack.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+MainBack.BackgroundTransparency = 0.4
+MainBack.BorderSizePixel = 0
+Instance.new("UICorner", MainBack).CornerRadius = UDim.new(0, 8)
+
+local Info = Instance.new("TextLabel", MainBack)
+Info.Size = UDim2.new(1, -20, 1, -10)
+Info.Position = UDim2.new(0, 10, 0, 5)
+Info.BackgroundTransparency = 1
+Info.TextColor3 = Color3.fromRGB(200, 200, 200)
+Info.Font = Enum.Font.Code
+Info.TextSize = 13
+Info.TextXAlignment = Enum.TextXAlignment.Left
+
 task.spawn(function()
     while task.wait(0.05) do
         local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
-        KillLabel.Text = "💀 KILLS: " .. (kills and tostring(kills.Value) or "0")
-        local currentFps = math.floor(1 / RS.RenderStepped:Wait())
-        FPSLabel.Text = "⚡ FPS: " .. currentFps
+        local fps = math.floor(1 / RS.RenderStepped:Wait())
+        Info.Text = string.format(
+            "SYNIOX DARK\n\nFPS: %d\nKills: %s\nHop: %ds", 
+            fps, 
+            (kills and tostring(kills.Value) or "0"), 
+            _G.CurrentHop or 0
+        )
     end
 end)
