@@ -102,7 +102,7 @@ task.spawn(function()
         local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
         local fps = math.floor(1 / RS.RenderStepped:Wait())
         Info.Text = string.format(
-            "SYNIOX DARK\n\nFPS: %d\nKills: %s\nHop: %ds", 
+            "SYNIOX KİLL PAİD\n\nFPS: %d\nKills: %s\nHop: %ds", 
             fps, 
             (kills and tostring(kills.Value) or "0"), 
             _G.CurrentHop or 0
