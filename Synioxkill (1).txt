@@ -7,7 +7,6 @@ local TeleportService = game:GetService("TeleportService")
 _G.KillActive = true
 _G.HopInterval = 50
 local SecretAreaPos = CFrame.new(1947, 2, 6191)
-local playerWhitelist = {}
 
 task.spawn(function()
     local lighting = game:GetService("Lighting")
@@ -54,7 +53,7 @@ task.spawn(function()
                 local rHand = char:FindFirstChild("RightHand")
                 if rHand then
                     for _, target in ipairs(Players:GetPlayers()) do
-                        if target ~= LocalPlayer and not playerWhitelist[target.Name] and target.Character then
+                        if target ~= LocalPlayer and target.Character then
                             local tRoot = target.Character:FindFirstChild("HumanoidRootPart")
                             local tHum = target.Character:FindFirstChild("Humanoid")
                             if tRoot and tHum and tHum.Health > 0 then
