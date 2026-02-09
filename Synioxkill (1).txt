@@ -50,19 +50,17 @@ task.spawn(function()
                 if punch.Parent ~= char then punch.Parent = char end
                 LocalPlayer.muscleEvent:FireServer("punch", "rightHand")
                 LocalPlayer.muscleEvent:FireServer("punch", "leftHand")
-                local hands = {char:FindFirstChild("RightHand"), char:FindFirstChild("LeftHand")}
-                for _, target in ipairs(Players:GetPlayers()) do
-                    if target ~= LocalPlayer and target.Character then
-                        local tRoot = target.Character:FindFirstChild("HumanoidRootPart")
-                        local tHum = target.Character:FindFirstChild("Humanoid")
-                        if tRoot and tHum and tHum.Health > 0 then
-                            tRoot.Size = Vector3.new(15, 15, 15)
-                            tRoot.CanCollide = false
-                            for _, hand in pairs(hands) do
-                                if hand then
-                                    firetouchinterest(hand, tRoot, 1)
-                                    firetouchinterest(hand, tRoot, 0)
-                                end
+                local rHand = char:FindFirstChild("RightHand")
+                if rHand then
+                    for _, target in ipairs(Players:GetPlayers()) do
+                        if target ~= LocalPlayer and target.Character then
+                            local tRoot = target.Character:FindFirstChild("HumanoidRootPart")
+                            local tHum = target.Character:FindFirstChild("Humanoid")
+                            if tRoot and tHum and tHum.Health > 0 then
+                                tRoot.Size = Vector3.new(15, 15, 15)
+                                tRoot.CanCollide = false
+                                firetouchinterest(rHand, tRoot, 1)
+                                firetouchinterest(rHand, tRoot, 0)
                             end
                         end
                     end
@@ -78,6 +76,7 @@ local function forceHop()
         local success, result = pcall(function()
             return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Desc&limit=100")).data
         end)
+        
         if success and result then
             for _, server in pairs(result) do
                 if server.playing >= 18 and server.playing < server.maxPlayers and server.id ~= game.JobId then
